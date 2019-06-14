@@ -14,6 +14,10 @@ deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
+  email: patrickmitchell87@icloud.com
+  name: Mitchell Patrick
   keep_history: true
+  allow_empty_commit: false
+  verbose: true
   on:
     branch: master
