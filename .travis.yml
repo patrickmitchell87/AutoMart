@@ -10,9 +10,6 @@ install:
 script:
   - npm run coveralls
 
-after_script:
-  - npm install coveralls && cat ./coverage/lcov.info | coveralls
-
 deploy:
   provider: pages
   skip_cleanup: true
