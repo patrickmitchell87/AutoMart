@@ -1,3 +1,9 @@
+# single test suite, non-parallel build.
+
+env:
+  global:
+    - CC_TEST_REPORTER_ID=a1eea21856d8ae55d2651f2a225b25ad0f311966b61b4da340cb81e9739ac9d8
+
 language: node_js
 node_js:
   - "stable"
@@ -7,8 +13,20 @@ cache: npm
 install:
   - npm install
 
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+
 script:
-  - echo "skipping tests"
+  - npm test
+
+# Pipe the coverage data to Code Climate
+after_script:
+  - ./cc-test-reporter format-coverage -t simplecov -o coverage/codeclimate.backend.json coverage/backend/.resultset.json # Format backend coverage
+  - ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.frontend.json coverage/frontend/lcov.info  # Format frontend coverage
+  - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 2                  # Sum both coverage parts into coverage/codeclimate.json
+  - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi  # Upload coverage/codeclimate.json
 
 deploy:
   provider: pages
@@ -20,4 +38,4 @@ deploy:
   allow_empty_commit: false
   verbose: true
   on:
-    branch: master
+    branch: test
